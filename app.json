@@ -1,6 +1,5 @@
 {
   "expo": {
-    "sdkVersion": "37.0.0",
     "name": "IT327",
     "slug": "IT327",
     "platforms": [
@@ -27,7 +26,6 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.lakib182.IT327",
       "buildNumber": "1.0.0"
-     
     },
     "android": {
       "package": "com.lakib182.IT327",
