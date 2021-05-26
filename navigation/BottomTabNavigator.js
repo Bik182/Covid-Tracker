@@ -20,7 +20,7 @@ export default function BottomTabNavigator({ navigation, route }) {
         component={HomeScreen}
         options={{
           title: 'Data by County',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-stats" />,
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="globe" />,
         }}
       />
       <BottomTab.Screen
@@ -29,7 +29,7 @@ export default function BottomTabNavigator({ navigation, route }) {
         options={{
           title: 'Data by State',
           
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-globe" />,
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="city" />,
         }}
       />
     </BottomTab.Navigator>

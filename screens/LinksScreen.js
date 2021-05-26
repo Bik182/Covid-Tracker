@@ -49,45 +49,23 @@ export default class LinksScreen extends React.Component {
     );
   };
 
-  // componentDidMount() {
-  //   fetch(
-  //     "https://covid-19-coronavirus-statistics.p.rapidapi.com/v1/stats?country=US",
-  //     {
-  //       method: "GET",
-  //       headers: {
-  //         "x-rapidapi-host": "covid-19-coronavirus-statistics.p.rapidapi.com",
-  //         "x-rapidapi-key":
-  //           "4b6e45e0d9mshb3b946b54b5b240p1be6fajsn782f4f14411b",
-  //       },
-  //     }
-  //   )
-  //     .then((res) => res.json())
-  //     .then((json) => {
-
-  //       this.filterData(json);
-  //       console.log("done");
-
-  //     })
-  //     .catch((err) => {
-  //       console.log("errr: ", err);
-  //     });
-  // }
-
-
-   componentDidMount() {
+  componentDidMount() {
     fetch(
-      "https://api.nomics.com/v1/currencies/ticker?key=fc5824be967e7659a0ed5cf20fe23fc1&ids=BTC,ETH,XRP&interval=1d,30d&convert=EUR",
+      "https://covid-19-coronavirus-statistics.p.rapidapi.com/v1/stats?country=US",
       {
         method: "GET",
         headers: {
+          "x-rapidapi-host": "covid-19-coronavirus-statistics.p.rapidapi.com",
+          "x-rapidapi-key":
+            "4b6e45e0d9mshb3b946b54b5b240p1be6fajsn782f4f14411b",
         },
       }
     )
       .then((res) => res.json())
       .then((json) => {
 
-       this.filterData1(json);
-        
+        this.filterData(json);
+        console.log("done");
 
       })
       .catch((err) => {
@@ -95,6 +73,8 @@ export default class LinksScreen extends React.Component {
       });
   }
 
+
+  
   onRefreshMain = () => {
     this.setState({
       refreshing: true,
@@ -121,14 +101,12 @@ export default class LinksScreen extends React.Component {
           featuredTitleStyle={styles.featuredTitleStyle1}
         >
           <SvgUri svgXmlData={  item.image} width="500" height="500"   />
-          <Text style={{ marginBottom: 10, textAlign: "center" }}>
-            Name:  {item.currency}
-          </Text> 
+      
 
           <Divider style={{ backgroundColor: "black" }} />
-          {/* <Text style={{ marginBottom: 10 }}>Deaths: {item.death_count}</Text> */}
-          <Text style={{ marginBottom: 10 }}>Price: {item.price}</Text>
-          <Text style={{ marginBottom: 10 }}>Market Change Cap: {item.oneDay}</Text>
+          <Text style={{ marginBottom: 10 }}>Deaths: {item.death_count}</Text>
+          <Text style={{ marginBottom: 10 }}>City: {item.city}</Text>
+          <Text style={{ marginBottom: 10 }}>State: {item.state}</Text>
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           ></View>
