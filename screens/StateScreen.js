@@ -27,7 +27,7 @@ import { Searchbar } from "react-native-paper";
 import { ListItem, SearchBar, Card, Divider } from "react-native-elements";
 import { MonoText } from "../components/StyledText";
 
-export default class LinksScreen extends React.Component {
+export default class StateScreen extends React.Component {
   constructor(props) {
     super(props);
 
@@ -92,7 +92,7 @@ export default class LinksScreen extends React.Component {
   };
 
   _renderItem = ({ item }) => {
-    //console.log("ITEM: ", item.onDay);
+   
     return (
       <View style={styles.container}>
        
@@ -153,7 +153,7 @@ export default class LinksScreen extends React.Component {
   filterData = (json) => {
     var finalData = [];
 
-    const data = _.sortBy(
+    const sortedData = _.sortBy(
       _.values(json.data.covid19Stats).map((eachObject) => (
         {
         cityName: eachObject.city,
@@ -165,7 +165,7 @@ export default class LinksScreen extends React.Component {
 
     var tempObj = {};
 
-    data.forEach(function (arrayItem) {
+    sortedData.forEach(function (arrayItem) {
       if (arrayItem.cityName == null) {
         tempObj = {
           state: arrayItem.stateName,
@@ -193,39 +193,6 @@ export default class LinksScreen extends React.Component {
     });
   };
 
-  filterData1 = (json) => {
-    var data = {};
-    var finalData = [];
-    console.log("wewwwewe: ");
-
-  
-
-
-    console.log("wewwwewe: ", data);
-    const data2 = _.sortBy(
-      _.values(json).map((eachObject) => (
-        {
-        oneDay: eachObject["1d"].market_cap_change,
-        image: eachObject.logo_url,
-        currency: eachObject.name,
-        price: eachObject.price,
-      }
-      ))
-    );
-    console.log("DATA: ", data2);
-    var tempObj = {};
-
-    
-
-    finalData.sort(
-      (a, b) => parseFloat(b.death_count) - parseFloat(a.death_count)
-    );
-    this.setState({
-      mainData: data2,
-      viewSource: data2,
-      noData: false,
-    });
-  };
 
   updateSearch = (search) => {
     this.setState({ search });
@@ -243,9 +210,9 @@ export default class LinksScreen extends React.Component {
       fData: true,
     });
     let text = this.state.search.toLowerCase();
-    let trucks = this.state.mainData;
+    let data = this.state.mainData;
 
-    let filteredName = trucks.filter((item) => {
+    let filteredName = data.filter((item) => {
       return item.state.toLowerCase().match(text);
     });
     if (!Array.isArray(filteredName) && !filteredName.length) {
@@ -301,7 +268,7 @@ export default class LinksScreen extends React.Component {
         <ImageBackground
           source={{
             uri:
-              "https://thenypost.files.wordpress.com/2019/12/australia-bushfires-could-have-killed-up-to-30-percent-of-koalas.jpg?quality=80&strip=all",
+              "https://www.biocodexmicrobiotainstitute.com/sites/default/files/2020-07/GP_Actu_syndrome%20post%C3%A9rieur%20mouill%C3%A9%20koalas_icono.jpg",
           }}
           style={styles.welcomeImage}
         >
@@ -379,7 +346,7 @@ export default class LinksScreen extends React.Component {
   }
 }
 
-LinksScreen.navigationOptions = {
+StateScreen.navigationOptions = {
   backgroundImage: (
     <Image
       style={{ width: 50, height: 50 }}

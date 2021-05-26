@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
-import LinksScreen from '../screens/LinksScreen';
+import StateScreen from '../screens/StateScreen';
 const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = 'Home';
 
@@ -25,7 +25,7 @@ export default function BottomTabNavigator({ navigation, route }) {
       />
       <BottomTab.Screen
         name="Links"
-        component={LinksScreen}
+        component={StateScreen}
         options={{
           title: 'Data by State',
           
