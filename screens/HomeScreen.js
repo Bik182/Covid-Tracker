@@ -18,6 +18,7 @@ import {
   FlatList,
   SafeAreaView,
   ImageBackground,
+  LogBox 
 } from "react-native";
 
 import {
@@ -28,6 +29,7 @@ import {
   Divider,
 } from "react-native-elements";
 import { MonoText } from "../components/StyledText";
+LogBox.ignoreAllLogs();
 
 export default class HomeScreen extends React.Component {
   constructor(props) {
@@ -184,12 +186,13 @@ export default class HomeScreen extends React.Component {
   };
 
   render(): PureComponent {
+
     return (
       <View style={styles.container}>
         <ImageBackground
           source={{
             uri:
-              "https://thenypost.files.wordpress.com/2019/12/australia-bushfires-could-have-killed-up-to-30-percent-of-koalas.jpg?quality=80&strip=all",
+              "https://images.theconversation.com/files/384925/original/file-20210218-12-1vl8xif.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=1200&h=1200.0&fit=crop",
           }}
           style={styles.welcomeImage}
         >
@@ -203,8 +206,8 @@ export default class HomeScreen extends React.Component {
               renderItem={this._renderItem}
               keyExtractor={(item, index) => "key" + index}
               ItemSeparatorComponent={this.renderSeparator}
-              refreshing={this.state.refreshing}
-              onRefresh={this.onRefreshMain}
+              //refreshing={this.state.refreshing}
+              //onRefresh={this.onRefreshMain}
             />
           </SafeAreaView>
         </ImageBackground>

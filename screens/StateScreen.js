@@ -4,8 +4,9 @@ import * as _ from "lodash";
 import { PureComponent } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
-import SvgUri from 'react-native-svg-uri';
+import SvgUri from "react-native-svg-uri";
 import { ScrollView } from "react-native-gesture-handler";
+
 import {
   Image,
   Platform,
@@ -25,9 +26,10 @@ import {
 } from "react-native";
 import { Searchbar } from "react-native-paper";
 import { ListItem, SearchBar, Card, Divider } from "react-native-elements";
+
 import { MonoText } from "../components/StyledText";
 
-export default class LinksScreen extends React.Component {
+export default class StateScreen extends React.Component {
   constructor(props) {
     super(props);
 
@@ -40,6 +42,9 @@ export default class LinksScreen extends React.Component {
       refresh: true,
       refreshing: false,
       needLoad: true,
+      fetchingError: null,
+      fetchingPending: null,
+      filtering: false,
       order: "a",
     };
   }
@@ -50,6 +55,10 @@ export default class LinksScreen extends React.Component {
   };
 
   componentDidMount() {
+    this.setState({
+      fetchingPending: true,
+      fetchingError: null,
+    });
     fetch(
       "https://covid-19-coronavirus-statistics.p.rapidapi.com/v1/stats?country=US",
       {
@@ -63,18 +72,22 @@ export default class LinksScreen extends React.Component {
     )
       .then((res) => res.json())
       .then((json) => {
-
+        this.setState({
+          fetchingPending: false,
+          fetchingError: null,
+        });
         this.filterData(json);
         console.log("done");
-
       })
       .catch((err) => {
+        this.setState({
+          fetchingPending: null,
+          fetchingError: true,
+        });
         console.log("errr: ", err);
       });
   }
 
-
-  
   onRefreshMain = () => {
     this.setState({
       refreshing: true,
@@ -92,16 +105,13 @@ export default class LinksScreen extends React.Component {
   };
 
   _renderItem = ({ item }) => {
-    //console.log("ITEM: ", item.onDay);
     return (
       <View style={styles.container}>
-       
         <Card
           featuredTitle={item.currency}
           featuredTitleStyle={styles.featuredTitleStyle1}
         >
-          <SvgUri svgXmlData={  item.image} width="500" height="500"   />
-      
+          <SvgUri svgXmlData={item.image} width="500" height="500" />
 
           <Divider style={{ backgroundColor: "black" }} />
           <Text style={{ marginBottom: 10 }}>Deaths: {item.death_count}</Text>
@@ -129,6 +139,10 @@ export default class LinksScreen extends React.Component {
   };
 
   fetchData = () => {
+    this.setState({
+      fetchingPending: true,
+      fetchingError: null,
+    });
     fetch(
       "https://covid-19-coronavirus-statistics.p.rapidapi.com/v1/stats?country=US",
       {
@@ -143,29 +157,35 @@ export default class LinksScreen extends React.Component {
       .then((res) => res.json())
       .then((json) => {
         // console.log(json);
+        this.setState({
+          fetchingPending: false,
+          fetchingError: null,
+        });
         this.filterData(json);
       })
       .catch((err) => {
+        this.setState({
+          fetchingPending: null,
+          fetchingError: true,
+        });
         console.log("err", err);
       });
   };
 
   filterData = (json) => {
-    var finalData = [];
+    let finalData = [];
 
-    const data = _.sortBy(
-      _.values(json.data.covid19Stats).map((eachObject) => (
-        {
+    const sortedData = _.sortBy(
+      _.values(json.data.covid19Stats).map((eachObject) => ({
         cityName: eachObject.city,
         stateName: eachObject.province,
         death: eachObject.deaths,
-      }
-      ))
+      }))
     );
 
-    var tempObj = {};
+    let tempObj = {};
 
-    data.forEach(function (arrayItem) {
+    sortedData.forEach(function (arrayItem) {
       if (arrayItem.cityName == null) {
         tempObj = {
           state: arrayItem.stateName,
@@ -193,42 +213,9 @@ export default class LinksScreen extends React.Component {
     });
   };
 
-  filterData1 = (json) => {
-    var data = {};
-    var finalData = [];
-    console.log("wewwwewe: ");
-
-  
-
-
-    console.log("wewwwewe: ", data);
-    const data2 = _.sortBy(
-      _.values(json).map((eachObject) => (
-        {
-        oneDay: eachObject["1d"].market_cap_change,
-        image: eachObject.logo_url,
-        currency: eachObject.name,
-        price: eachObject.price,
-      }
-      ))
-    );
-    console.log("DATA: ", data2);
-    var tempObj = {};
-
-    
-
-    finalData.sort(
-      (a, b) => parseFloat(b.death_count) - parseFloat(a.death_count)
-    );
-    this.setState({
-      mainData: data2,
-      viewSource: data2,
-      noData: false,
-    });
-  };
-
   updateSearch = (search) => {
     this.setState({ search });
+    this.searchText();
   };
 
   onClear = () => {
@@ -241,11 +228,13 @@ export default class LinksScreen extends React.Component {
     this.setState({
       noData: true,
       fData: true,
+      filtering: true,
+      fetchingPending: true,
     });
     let text = this.state.search.toLowerCase();
-    let trucks = this.state.mainData;
+    let data = this.state.mainData;
 
-    let filteredName = trucks.filter((item) => {
+    let filteredName = data.filter((item) => {
       return item.state.toLowerCase().match(text);
     });
     if (!Array.isArray(filteredName) && !filteredName.length) {
@@ -260,6 +249,8 @@ export default class LinksScreen extends React.Component {
       this.setState({
         noData: false,
         filteredData: filteredName,
+        filtering: false,
+        fetchingPending: false,
       });
     }
   };
@@ -300,52 +291,45 @@ export default class LinksScreen extends React.Component {
       <View style={styles.container}>
         <ImageBackground
           source={{
-            uri:
-              "https://thenypost.files.wordpress.com/2019/12/australia-bushfires-could-have-killed-up-to-30-percent-of-koalas.jpg?quality=80&strip=all",
+            uri: "https://cdn.britannica.com/26/162626-050-3534626F/Koala.jpg",
           }}
           style={styles.welcomeImage}
         >
-          <ScrollView
-            style={styles.container}
-            contentContainerStyle={styles.contentContainer1}
-          >
-            <SearchBar
-              platform="android"
-              fontColor="#c6c6c6"
-              iconColor="transparent"
-              shadowColor="transparent"
-              cancelIconColor="#c6c6c6"
-              backgroundColor="transparent"
-              placeholder="Type here..."
-              onChangeText={this.updateSearch}
-              onClear={this.onClear}
-              value={search}
-            />
+          <SearchBar
+            platform="android"
+            fontColor="#c6c6c6"
+            iconColor="transparent"
+            shadowColor="transparent"
+            cancelIconColor="#c6c6c6"
+            backgroundColor="transparent"
+            placeholder="Type here..."
+            onChangeText={this.updateSearch}
+            onClear={this.onClear}
+            value={search}
+          />
 
-            <View style={styles.welcomeContainer}>
-              <MaterialIcons
-                size={50}
-                name="search"
-                onPress={this.searchText}
-                style={styles.icon1}
-              />
+          <View style={styles.separator} />
 
-              <MaterialIcons
-                size={25}
-                name="reorder"
-                onPress={this.changeOrder}
-                style={styles.icon}
-              />
+          <TouchableOpacity onPress={this.handleLearnMorePress}>
+            <Text style={styles.texty}>credit: KishCom</Text>
+          </TouchableOpacity>
 
-              <View style={styles.separator} />
-            </View>
-            <View style={styles.helpContainer}>
-              <Text style={styles.texty}>(State : County / City)</Text>
-              <TouchableOpacity onPress={this.handleLearnMorePress}>
-                <Text style={styles.texty}>credit: KishCom</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.separator} />
+          <View style={styles.separator} />
+          {this.state.filtering || this.state.fetchingPending ? (
+            <ActivityIndicator
+              size="large"
+              color="white"
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              animating={
+                this.state.fetchingPending == true ||
+                this.state.filtering == true
+              }
+            ></ActivityIndicator>
+          ) : (
             <SafeAreaView style={styles.container}>
               {this.state.noData ? (
                 <Text style={styles.texty1}>
@@ -353,7 +337,6 @@ export default class LinksScreen extends React.Component {
                   Possible network error or backend is down :({" "}
                 </Text>
               ) : (
-               
                 <FlatList
                   contentContainerStyle={{
                     flexGrow: 1,
@@ -372,20 +355,19 @@ export default class LinksScreen extends React.Component {
                 />
               )}
             </SafeAreaView>
-          </ScrollView>
+          )}
         </ImageBackground>
       </View>
     );
   }
 }
 
-LinksScreen.navigationOptions = {
+StateScreen.navigationOptions = {
   backgroundImage: (
     <Image
       style={{ width: 50, height: 50 }}
       source={{
-        uri:
-          "https://thenypost.files.wordpress.com/2019/12/australia-bushfires-could-have-killed-up-to-30-percent-of-koalas.jpg?quality=80&strip=all",
+        uri: "https://thenypost.files.wordpress.com/2019/12/australia-bushfires-could-have-killed-up-to-30-percent-of-koalas.jpg?quality=80&strip=all",
       }}
     />
   ),
@@ -399,9 +381,9 @@ LinksScreen.navigationOptions = {
 
 const styles = StyleSheet.create({
   separator: {
-    marginVertical: 8,
-    borderBottomColor: "#737373",
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    // marginVertical: 8,
+    // borderBottomColor: "#737373",
+    // borderBottomWidth: StyleSheet.hairlineWidth,
   },
   icon: {
     position: "absolute",
@@ -409,7 +391,7 @@ const styles = StyleSheet.create({
     top: 0,
     color: "white",
   },
-  logo:{
+  logo: {
     width: 50,
     height: 50,
   },
@@ -444,7 +426,7 @@ const styles = StyleSheet.create({
   },
   welcomeImage: {
     flex: 1,
-    resizeMode: "cover",
+    resizeMode: "contain",
     justifyContent: "center",
   },
   getStartedContainer: {
